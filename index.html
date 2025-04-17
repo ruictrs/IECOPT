@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生信息管理系统</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .login-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-top: 50px;
+        }
+        .login-container h1 {
+            color: #2c3e50;
+        }
+        .login-container input {
+            padding: 10px;
+            width: 70%;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .login-container button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .login-container button:hover {
+            background-color: #2980b9;
+        }
+        .error-message {
+            color: #e74c3c;
+            margin-top: 10px;
+            display: none;
+        }
+        .student-list {
+            display: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .student-info {
+            display: none;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        .student-info h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .student-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .student-details-left {
+            flex: 2;
+            min-width: 300px;
+        }
+        .student-details-right {
+            flex: 1;
+            min-width: 200px;
+        }
+        .info-item {
+            margin-bottom: 10px;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #3498db;
+        }
+        .student-photo-container {
+            width: 200px;
+            height: 250px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .student-photo {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .call-button {
+            display: inline-block;
+            margin-top: 5px;
+            padding: 5px 10px;
+            background-color: #2ecc71;
+            color: white;
+            text-decoration: none;
+            border-radius: 3px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .call-button:hover {
+            background-color: #27ae60;
+        }
+        .address-container {
+            word-wrap: break-word;
+            max-width: 100%;
+        }
+        .back-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #2ecc71;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .back-button:hover {
+            background-color: #27ae60;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="login-container" id="loginContainer">
+            <h1>学生信息管理系统</h1>
+            <input type="password" id="password" placeholder="请输入密码">
+            <button onclick="checkPassword()">登录</button>
+            <div class="error-message" id="errorMessage">密码错误，请重试！</div>
+        </div>
+
+        <div class="student-list" id="studentList">
+            <h1>学生列表</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>姓名</th>
+                        <th>班级</th>
+                        <th>家长联系方式</th>
+                    </tr>
+                </thead>
+                <tbody id="studentTableBody">
+                    <!-- 学生列表将通过JavaScript动态生成 -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="student-info" id="studentInfo">
+            <h2 id="studentNameTitle"></h2>
+            <div class="student-details">
+                <div class="student-details-left">
+                    <div class="info-item">
+                        <span class="info-label">姓名:</span>
+                        <span id="infoName"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">性别:</span>
+                        <span id="infoGender"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">班级:</span>
+                        <span id="infoClass"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">民族:</span>
+                        <span id="infoEthnicity"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">出生日期:</span>
+                        <span id="infoBirthDate"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">证件类型:</span>
+                        <span id="infoIdType"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">证件号:</span>
+                        <span id="infoIdNumber"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">学籍号:</span>
+                        <span id="infoStudentId"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">入学年月:</span>
+                        <span id="infoEnrollmentDate"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">政治面貌:</span>
+                        <span id="infoPoliticalStatus"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">家长联系方式:</span>
+                        <span id="infoParentContact"></span>
+                        <span class="call-button" id="callButton">拨号</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">健康状况:</span>
+                        <span id="infoHealthStatus"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">通讯地址:</span>
+                        <div class="address-container" id="infoAddress"></div>
+                    </div>
+                </div>
+                <div class="student-details-right">
+                    <div class="student-photo-container" id="studentPhotoContainer">
+                        <img id="studentPhoto" class="student-photo" src="" alt="学生照片">
+                    </div>
+                </div>
+            </div>
+            <a href="#" class="back-button" onclick="goBack()">返回列表</a>
+        </div>
+    </div>
+
+    <script>
+        // 学生信息存储库
+        const studentDatabase = [
+            {
+                name: "薛荟茹",
+                gender: "女",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2008-09-14",
+                idType: "中国居民身份证",
+                idNumber: "152221200809145022",
+                studentId: "G152221200809145022",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "13044361083",
+                healthStatus: "健康或良好",
+                address: "内蒙古兴安盟科尔泌右翼前旗跃进那场第四生产队082号",
+                photo: "https://github.com/yourusername/student-photos/raw/main/xuehuiru.jpg"
+            },
+            {
+                name: "杨芳茗",
+                gender: "女",
+                className: "4班",
+                ethnicity: "满族",
+                birthDate: "2008-05-25",
+                idType: "中国居民身份证",
+                idNumber: "210624200805250023",
+                studentId: "G210624200805250023",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "18243652028",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市烧锅镇乡富民村",
+                photo: "https://github.com/yourusername/student-photos/raw/main/yangfangming.jpg"
+            },
+            {
+                name: "赵恒",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2008-12-09",
+                idType: "中国居民身份证",
+                idNumber: "220723200812090014",
+                studentId: "G220723200812090014",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "18643613010",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市龙沼镇八方后八方屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/zhao_heng.jpg"
+            },
+            {
+                name: "马思琪",
+                gender: "女",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2007-10-08",
+                idType: "中国居民身份证",
+                idNumber: "220882200710083425",
+                studentId: "G220882200710083425",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "13604363749",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市龙沼镇兴学村罗围子屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/ma_siqi.jpg"
+            },
+            {
+                name: "张洋",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2007-10-19",
+                idType: "中国居民身份证",
+                idNumber: "220882200710192111",
+                studentId: "G220882200710192111",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "15704083062",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市乐胜乡长安村太平川屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/zhang_yang.jpg"
+            },
+            {
+                name: "张浚钊",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2008-01-16",
+                idType: "中国居民身份证",
+                idNumber: "220882200801165514",
+                studentId: "G220882200801165514",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "13843637616",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市新平安镇长进村四里卜",
+                photo: "https://github.com/yourusername/student-photos/raw/main/zhang_junzhao.jpg"
+            },
+            {
+                name: "王圣友",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2008-01-21",
+                idType: "中国居民身份证",
+                idNumber: "220882200801213416",
+                studentId: "G220882200801213416",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "15943653052",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市兴俭村谭围子屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/wang_shengyou.jpg"
+            },
+            {
+                name: "王煜丹",
+                gender: "女",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2008-02-09",
+                idType: "中国居民身份证",
+                idNumber: "220882200802092724",
+                studentId: "G220882200802092724",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "15943653769",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市烧锅镇乡富国村小八队屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/wang_yudan.jpg"
+            },
+            {
+                name: "韩志军",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2008-03-18",
+                idType: "中国居民身份证",
+                idNumber: "220882200803180910",
+                studentId: "G220882200803180910",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "15043636075",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市新平安镇长胜村五里卜屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/han_zhijun.jpg"
+            },
+            {
+                name: "倪硕",
+                gender: "男",
+                className: "4班",
+                ethnicity: "蒙古族",
+                birthDate: "2008-04-09",
+                idType: "中国居民身份证",
+                idNumber: "220882200804094213",
+                studentId: "G220882200804094213",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "15944651653",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市新艾里蒙古族乡河浦屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/ni_shuo.jpg"
+            },
+            {
+                name: "胡尚昆",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2008-05-12",
+                idType: "中国居民身份证",
+                idNumber: "220882200805122618",
+                studentId: "G220882200805122618",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "18643042122",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市丰收镇新付村韩家窝屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/hu_shangkun.jpg"
+            },
+            {
+                name: "荆杰超",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2008-05-13",
+                idType: "中国居民身份证",
+                idNumber: "22088220080513271X",
+                studentId: "G22088220080513271X",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "15504362279",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市烧锅镇乡富新村闫家围子屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/jing_jiechao.jpg"
+            },
+            {
+                name: "王瑞艺",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2008-05-13",
+                idType: "中国居民身份证",
+                idNumber: "220882200805133413",
+                studentId: "G220882200805133413",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "15834638322",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市龙沼镇兴胜村苗围子屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/wang_ruiyi.jpg"
+            },
+            {
+                name: "李嘉峻",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2008-05-29",
+                idType: "中国居民身份证",
+                idNumber: "220882200805290312",
+                studentId: "G220882200805290312",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "13894652917",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市安广镇六中家属楼",
+                photo: "https://github.com/yourusername/student-photos/raw/main/li_jiajun.jpg"
+            },
+            {
+                name: "杨宇航",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2008-06-23",
+                idType: "中国居民身份证",
+                idNumber: "220882200806232712",
+                studentId: "G220882200806232712",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "15844658662",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市烧锅镇乡富裕村小石围子屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/yang_yuhang.jpg"
+            },
+            {
+                name: "葛硕博",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2008-07-12",
+                idType: "中国居民身份证",
+                idNumber: "220882200807123614",
+                studentId: "G220882200807123614",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "15330789294",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市大岗子镇前岗子屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/ge_shuobo.jpg"
+            },
+            {
+                name: "何雨聪",
+                gender: "女",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2008-08-31",
+                idType: "中国居民身份证",
+                idNumber: "220882200808312740",
+                studentId: "G220882200808312740",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "18843630182",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市烧锅镇乡付田村东五家户屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/he_yucun.jpg"
+            },
+            {
+                name: "徐诗雨",
+                gender: "女",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2008-09-12",
+                idType: "中国居民身份证",
+                idNumber: "220882200809122121",
+                studentId: "G220882200809122121",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "15543465688",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市乐胜乡长新村吕相武屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/xu_shiyu.jpg"
+            },
+            {
+                name: "刘小玉",
+                gender: "女",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2008-09-24",
+                idType: "中国居民身份证",
+                idNumber: "22088220080924214X",
+                studentId: "G22088220080924214X",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "13624365589",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市乐胜乡同生村兴龙山屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/liu_xiaoyu.jpg"
+            },
+            {
+                name: "张奕涵",
+                gender: "女",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2008-09-29",
+                idType: "中国居民身份证",
+                idNumber: "220882200809290328",
+                studentId: "G220882200809290328",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "15383960960",
+                healthStatus: "健康或良好",
+                address: "吉林省白城市洮北区城南街道五委十组",
+                photo: "https://github.com/yourusername/student-photos/raw/main/zhang_yihan.jpg"
+            },
+            {
+                name: "杜致运",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2008-10-13",
+                idType: "中国居民身份证",
+                idNumber: "220882200810132116",
+                studentId: "G220882200810132116",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "18843631114",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市安广镇乐胜乡杜围屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/du_zhiyun.jpg"
+            },
+            {
+                name: "郑书宜",
+                gender: "女",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2008-10-26",
+                idType: "中国居民身份证",
+                idNumber: "220882200810260345",
+                studentId: "G220882200810260345",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "15114454745",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市安广镇新荒村东岗子屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/zheng_shuyi.jpg"
+            },
+            {
+                name: "王鑫童",
+                gender: "女",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2008-10-30",
+                idType: "中国居民身份证",
+                idNumber: "220882200810301629",
+                studentId: "G220882200810301629",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "13404432260",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市红岗乡南岗子村它拉红屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/wang_xintong.jpg"
+            },
+            {
+                name: "戚世涵",
+                gender: "女",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2008-11-19",
+                idType: "中国居民身份证",
+                idNumber: "220882200811192620",
+                studentId: "G220882200811192620",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "13596854432",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市丰收镇新乐村四家屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/qi_shihan.jpg"
+            },
+            {
+                name: "郑文雪",
+                gender: "女",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2008-11-29",
+                idType: "中国居民身份证",
+                idNumber: "22088220081129212X",
+                studentId: "G22088220081129212X",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "13894654001",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市乐胜乡永乐村西三门胡",
+                photo: "https://github.com/yourusername/student-photos/raw/main/zheng_wenxue.jpg"
+            },
+            {
+                name: "周麟朔",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2008-12-02",
+                idType: "中国居民身份证",
+                idNumber: "220882200812020919",
+                studentId: "G220882200812020919",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "13614363044",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市新平安镇长兴村周地印屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/zhou_lingshuo.jpg"
+            },
+            {
+                name: "王焱",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2008-12-12",
+                idType: "中国居民身份证",
+                idNumber: "220882200812120311",
+                studentId: "G220882200812120311",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "15114450050",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市安广镇永丰村张家庐屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/wang_yan.jpg"
+            },
+            {
+                name: "王玉松",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2008-12-19",
+                idType: "中国居民身份证",
+                idNumber: "220882200812192614",
+                studentId: "G220882200812192614",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "13894625971",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市丰收镇付安村韩家屯子",
+                photo: "https://github.com/yourusername/student-photos/raw/main/wang_yusong.jpg"
+            },
+            {
+                name: "赵慧鑫",
+                gender: "女",
+                className: "4班",
+                ethnicity: "满族",
+                birthDate: "2008-12-28",
+                idType: "中国居民身份证",
+                idNumber: "220882200812282628",
+                studentId: "G220882200812282628",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "13894659304",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市丰收真新立卜村",
+                photo: "https://github.com/yourusername/student-photos/raw/main/zhao_huixin.jpg"
+            },
+            {
+                name: "王雪琦",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2008-12-28",
+                idType: "中国居民身份证",
+                idNumber: "220882200812282716",
+                studentId: "G220882200812282716",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "15734359392",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市烧锅镇乡富强村前套克苏屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/wang_xueqi.jpg"
+            },
+            {
+                name: "柳佳阳",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2009-01-03",
+                idType: "中国居民身份证",
+                idNumber: "220882200901032719",
+                studentId: "G220882200901032719",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "13843651266",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市烧锅镇银富治村大黑鲀",
+                photo: "https://github.com/yourusername/student-photos/raw/main/liu_jiayang.jpg"
+            },
+            {
+                name: "张键",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2009-01-07",
+                idType: "中国居民身份证",
+                idNumber: "220882200901072710",
+                studentId: "G220882200901072710",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "15943635971",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市烧锅镇富国村哈拉火烧屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/zhang_jian.jpg"
+            },
+            {
+                name: "丁彬",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2009-01-10",
+                idType: "中国居民身份证",
+                idNumber: "220882200901100531",
+                studentId: "G220882200901100531",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "13894659472",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市舍力镇东升村腰太平屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/ding_bin.jpg"
+            },
+            {
+                name: "张云松",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2009-01-13",
+                idType: "中国居民身份证",
+                idNumber: "220882200901130511",
+                studentId: "G220882200901130511",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "15704080199",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市舍力镇民新村太平山屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/zhang_yunsong.jpg"
+            },
+            {
+                name: "马菡",
+                gender: "女",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2009-01-29",
+                idType: "中国居民身份证",
+                idNumber: "220882200901294225",
+                studentId: "G220882200901294225",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "18443663377",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市新艾里蒙古族乡民兴村瞿家屯子",
+                photo: "https://github.com/yourusername/student-photos/raw/main/ma_han.jpg"
+            },
+            {
+                name: "谷雨洋",
+                gender: "女",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2009-02-10",
+                idType: "中国居民身份证",
+                idNumber: "220882200902103128",
+                studentId: "G220882200902103128",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "15694367776",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市叉干镇庆发村叉干挠屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/gu_yuyang.jpg"
+            },
+            {
+                name: "郑阳阳",
+                gender: "女",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2009-02-11",
+                idType: "中国居民身份证",
+                idNumber: "220882200902114222",
+                studentId: "G220882200902114222",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "13704375249",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市新艾里蒙古族乡民兴村河浦屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/zheng_yangyang.jpg"
+            },
+            {
+                name: "王楚鑫",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2009-02-16",
+                idType: "中国居民身份证",
+                idNumber: "220882200902160333",
+                studentId: "G220882200902160333",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "18504360756",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市安广镇安平街3委39组",
+                photo: "https://github.com/yourusername/student-photos/raw/main/wang_chuxin.jpg"
+            },
+            {
+                name: "来春雪",
+                gender: "女",
+                className: "4班",
+                ethnicity: "蒙古族",
+                birthDate: "2009-02-20",
+                idType: "中国居民身份证",
+                idNumber: "220882200902200526",
+                studentId: "G220882200902200526",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "18343635486",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市舍力镇富饶街北八组",
+                photo: "https://github.com/yourusername/student-photos/raw/main/lai_chunxue.jpg"
+            },
+            {
+                name: "程大勇",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2009-03-04",
+                idType: "中国居民身份证",
+                idNumber: "22088220090304211X",
+                studentId: "G22088220090304211X",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "13894652604",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市乐胜乡永茂树大围屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/cheng_dayong.jpg"
+            },
+            {
+                name: "潘涵",
+                gender: "女",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2009-03-11",
+                idType: "中国居民身份证",
+                idNumber: "220882200903112122",
+                studentId: "G220882200903112122",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "15043650822",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市乐胜乡永乐村东三门胡屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/pan_han.jpg"
+            },
+            {
+                name: "刘蕊宁",
+                gender: "女",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2009-03-17",
+                idType: "中国居民身份证",
+                idNumber: "22088220090317362X",
+                studentId: "G22088220090317362X",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "15843650597",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市大岗子镇前岗子村",
+                photo: "https://github.com/yourusername/student-photos/raw/main/liu_ruining.jpg"
+            },
+            {
+                name: "邹雨函",
+                gender: "女",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2009-03-28",
+                idType: "中国居民身份证",
+                idNumber: "220882200903280521",
+                studentId: "G220882200903280521",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "18843638855",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市舍力镇庆民村包省屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/zou_yuhan.jpg"
+            },
+            {
+                name: "刘赫",
+                gender: "女",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2009-04-07",
+                idType: "中国居民身份证",
+                idNumber: "220882200904073428",
+                studentId: "G220882200904073428",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "13674377223",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市龙沼镇红光村董围子屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/liu_he.jpg"
+            },
+            {
+                name: "孙嫚娇",
+                gender: "女",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2009-04-15",
+                idType: "中国居民身份证",
+                idNumber: "220882200904152740",
+                studentId: "G220882200904152740",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "13694462584",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市烧锅镇乡新兴村拉斯嘎屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/sun_manjiao.jpg"
+            },
+            {
+                name: "吴君翰",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2009-05-05",
+                idType: "中国居民身份证",
+                idNumber: "220882200905050316",
+                studentId: "G220882200905050316",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "13634365430",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市永庆村满良窝卜屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/wu_junhan.jpg"
+            },
+            {
+                name: "苏靖琪",
+                gender: "女",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2009-05-06",
+                idType: "中国居民身份证",
+                idNumber: "220882200905060522",
+                studentId: "G220882200905060522",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "13664473811",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市舍力镇民新村宝青山屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/su_jingqi.jpg"
+            },
+            {
+                name: "刘雨晴",
+                gender: "女",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2009-05-26",
+                idType: "中国居民身份证",
+                idNumber: "220882200905260524",
+                studentId: "G220882200905260524",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "18743636188",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市舍力镇民有村东木亚屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/liu_yuqing.jpg"
+            },
+            {
+                name: "张宇麒",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2009-05-28",
+                idType: "中国居民身份证",
+                idNumber: "220882200905282133",
+                studentId: "G220882200905282133",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "15843637902",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市乐胜乡永茂村富特启屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/zhang_yuqi.jpg"
+            },
+            {
+                name: "于洪宇",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2009-06-29",
+                idType: "中国居民身份证",
+                idNumber: "220882200906293619",
+                studentId: "G220882200906293619",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "15843630445",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市大岗子镇靠山屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/yu_hongyu.jpg"
+            },
+            {
+                name: "崔宏硕",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2009-07-03",
+                idType: "中国居民身份证",
+                idNumber: "220882200907032111",
+                studentId: "G220882200907032111",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "13596825637",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市乐胜乡同生村大五家屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/cui_hongshuo.jpg"
+            },
+            {
+                name: "李翼",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2009-08-07",
+                idType: "中国居民身份证",
+                idNumber: "220882200908072115",
+                studentId: "G220882200908072115",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "13124362157",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市乐胜乡永乐村西三门胡屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/li_yi.jpg"
+            },
+            {
+                name: "杨雨姗",
+                gender: "女",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2009-08-10",
+                idType: "中国居民身份证",
+                idNumber: "220882200908103428",
+                studentId: "G220882200908103428",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "18244135833",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市龙沼镇兴胜村苗围子屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/yang_yushan.jpg"
+            },
+            {
+                name: "田青斗",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2009-08-20",
+                idType: "中国居民身份证",
+                idNumber: "220882200908200914",
+                studentId: "G220882200908200914",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "13234361411",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市新平安镇长建村王家店屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/tian_qingdou.jpg"
+            },
+            {
+                name: "李家祥",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2009-08-27",
+                idType: "中国居民身份证",
+                idNumber: "220882200908272619",
+                studentId: "G220882200908272619",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "13943651785",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市丰收镇付安村干布召屯",
+                photo: "https://github.com/yourusername/student-photos/raw/main/li_jiaxiang.jpg"
+            },
+            {
+                name: "邹昕燃",
+                gender: "男",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2008-09-05",
+                idType: "中国居民身份证",
+                idNumber: "230126200809052111",
+                studentId: "G230126200809052111",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "15143636936",
+                healthStatus: "健康或良好",
+                address: "吉林省大安市安广镇龙泉街三委十一组",
+                photo: "https://github.com/ruictrs/IECOPT/00000.jpg"
+            },
+            {
+                name: "孙雨婷",
+                gender: "女",
+                className: "4班",
+                ethnicity: "汉族",
+                birthDate: "2008-06-07",
+                idType: "中国居民身份证",
+                idNumber: "23050520080607004X",
+                studentId: "G23050520080607004X",
+                enrollmentDate: "2024-09",
+                politicalStatus: "群众",
+                parentContact: "13894103801",
+                healthStatus: "健康或良好",
+                address: "黑龙江省双鸭山市四方台区振兴中路秀山胡同四栋一号",
+                photo: "https://github.com/yourusername/student-photos/raw/main/sun_yuting.jpg"
+            }
+        ];
+
+        // 密码验证
+        function checkPassword() {
+            const password = document.getElementById("password").value;
+            if (password === "GAOYISIBAN") {
+                document.getElementById("loginContainer").style.display = "none";
+                document.getElementById("studentList").style.display = "block";
+                generateStudentTable();
+            } else {
+                document.getElementById("errorMessage").style.display = "block";
+            }
+        }
+
+        // 生成学生表格
+        function generateStudentTable() {
+            const tableBody = document.getElementById("studentTableBody");
+            tableBody.innerHTML = "";
+
+            studentDatabase.forEach(student => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td><a href="#" onclick="showStudentInfo('${student.name}')">${student.name}</a></td>
+                    <td>${student.className}</td>
+                    <td>${student.parentContact}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // 显示学生信息
+        function showStudentInfo(name) {
+            const student = studentDatabase.find(s => s.name === name);
+            if (student) {
+                document.getElementById("studentList").style.display = "none";
+                document.getElementById("studentInfo").style.display = "block";
+                document.getElementById("studentNameTitle").textContent = student.name;
+
+                // 设置照片
+                const photoContainer = document.getElementById("studentPhotoContainer");
+                const photo = document.getElementById("studentPhoto");
+                if (student.photo) {
+                    photo.src = student.photo;
+                    photo.style.display = "block";
+                } else {
+                    photo.style.display = "none";
+                    photoContainer.style.backgroundColor = "#f0f0f0";
+                }
+
+                // 填充学生信息
+                document.getElementById("infoName").textContent = student.name;
+                document.getElementById("infoGender").textContent = student.gender;
+                document.getElementById("infoClass").textContent = student.className;
+                document.getElementById("infoEthnicity").textContent = student.ethnicity;
+                document.getElementById("infoBirthDate").textContent = student.birthDate;
+                document.getElementById("infoIdType").textContent = student.idType;
+                document.getElementById("infoIdNumber").textContent = student.idNumber;
+                document.getElementById("infoStudentId").textContent = student.studentId;
+                document.getElementById("infoEnrollmentDate").textContent = student.enrollmentDate;
+                document.getElementById("infoPoliticalStatus").textContent = student.politicalStatus;
+                document.getElementById("infoParentContact").textContent = student.parentContact;
+                document.getElementById("infoHealthStatus").textContent = student.healthStatus;
+                document.getElementById("infoAddress").textContent = student.address;
+
+                // 设置拨号按钮的点击事件
+                document.getElementById("callButton").onclick = function() {
+                    window.location.href = `tel:${student.parentContact}`;
+                };
+            }
+        }
+
+        // 返回列表
+        function goBack() {
+            document.getElementById("studentInfo").style.display = "none";
+            document.getElementById("studentList").style.display = "block";
+        }
+    </script>
+</body>
+</html>
